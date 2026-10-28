@@ -22,7 +22,8 @@ FIELDS = [
     "question_id", "mode", "question_type", "question", "gold_answer", "answer",
     "gold_in_answer", "token_f1", "citations_valid", "cited_gold_fraction",
     "all_gold_retrieved", "all_gold_cited", "gold_sources", "retrieved_sources",
-    "cited_sources", "tool_searches", "status", "error",
+    "cited_sources", "tool_searches", "structured_tool_calls", "fallback_searches",
+    "status", "error",
 ]
 
 
@@ -80,6 +81,8 @@ def score_result(item: dict, result: dict) -> dict:
         "retrieved_sources": json.dumps(sorted(retrieved)),
         "cited_sources": json.dumps(sorted(cited_sources)),
         "tool_searches": json.dumps(result.get("search_queries", []), ensure_ascii=False),
+        "structured_tool_calls": result.get("structured_tool_calls", ""),
+        "fallback_searches": result.get("fallback_searches", ""),
         "status": result.get("status", ""),
         "error": "",
     }
@@ -166,7 +169,7 @@ def main():
                                  search_rounds=a.rounds,
                                  model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"))
             rows[qid] = {**score_result(item, result), "mode": a.mode}
-            print(f"PASS {new + 1}/{a.max_new}: {qid} | gold_in_answer={rows[qid]['gold_in_answer']} | all_gold_cited={rows[qid]['all_gold_cited']}", flush=True)
+            print(f"PASS {new + 1}/{a.max_new}: {qid} | gold_in_answer={rows[qid]['gold_in_answer']} | all_gold_cited={rows[qid]['all_gold_cited']} | tools={rows[qid]['structured_tool_calls']} | fallbacks={rows[qid]['fallback_searches']}", flush=True)
         except Exception as exc:
             rows[qid] = {**{k: "" for k in FIELDS}, "question_id": qid,
                          "mode": a.mode, "question_type": item.get("question_type", ""),
