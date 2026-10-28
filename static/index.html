@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence Investigation Engine</title>
+<style>
+:root{color-scheme:dark;font:15px/1.5 system-ui,-apple-system,sans-serif;background:#0b1120;color:#e7edf7}
+*{box-sizing:border-box}body{max-width:1100px;margin:0 auto;padding:24px 20px 55px}
+header{border-bottom:1px solid #334155;padding-bottom:20px;margin-bottom:24px}h1{font-size:27px;margin:0 0 6px}h2{font-size:18px;margin:0 0 14px}
+p{margin:5px 0;color:#a8b7ca}.subtitle{max-width:720px}
+main{display:grid;grid-template-columns:1fr 1fr;gap:22px}.full{grid-column:1/-1}
+section{border:1px solid #334155;border-radius:12px;padding:20px;background:#101b2f}
+label{display:block;font-size:13px;color:#b6c3d4;margin-bottom:5px}
+input,textarea,select,button{font:inherit}input,textarea,select{width:100%;background:#0b1120;border:1px solid #41516a;border-radius:7px;color:#e7edf7;padding:10px;margin-bottom:11px}textarea{min-height:94px;resize:vertical}input[type=file]{padding:8px}button{border:0;background:#43c6c6;color:#07131d;padding:9px 17px;border-radius:7px;cursor:pointer;font-weight:700}button:disabled{opacity:.5;cursor:wait}.secondary{background:#29374d;color:#e7edf7}.danger{background:#4d2632;color:#ffced3}.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#status{color:#b3ddf2;min-height:24px;margin-top:10px;white-space:pre-wrap}#result{white-space:pre-wrap;line-height:1.65;margin-bottom:18px}
+.source{border:1px solid #28394e;border-radius:8px;margin-top:9px;padding:10px}.source summary{cursor:pointer}.source p{white-space:pre-wrap;overflow-wrap:anywhere}.muted{color:#93a7be;font-size:12px}.doc{border-top:1px solid #253449;padding:10px 0}.doc .actions{margin-top:6px}.doc strong{overflow-wrap:anywhere}.error{color:#ffb5b5 !important}
+@media(max-width:720px){main{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<header><h1>Evidence Investigation Engine</h1><p class="subtitle">Investigate questions using 50,000 HotpotQA passages or your own PDF, Markdown, and text documents. Generated answers reference retrieved sources.</p></header>
+<main>
+<section class="full">
+<h2>Demo access</h2><label for="token">Demo token (kept only in this browser tab's memory)</label>
+<input type="password" autocomplete="off" id="token" placeholder="Enter the token shared by the project owner">
+<p class="muted">The token is never stored in localStorage or embedded in this webpage. Do not use your Qdrant or Groq API key here.</p>
+</section>
+<section class="full">
+<h2>Ask an investigation question</h2>
+<label for="question">Question</label><textarea id="question">Which magazine started first, Arthur's Magazine or First for Women?</textarea>
+<div class="actions"><div><label for="scope">Search corpus</label><select id="scope"><option value="both">Both datasets</option><option value="hotpot">50,000 HotpotQA passages</option><option value="uploaded">Uploaded documents only</option></select></div>
+<div><label for="mode">Retrieval method</label><select id="mode"><option value="hybrid">Hybrid (dense + BM25)</option><option value="dense">Dense-only baseline</option></select></div>
+<button id="ask">Investigate</button></div>
+<div id="status" role="status"></div><h2 id="resultTitle" hidden>Answer</h2><div id="result"></div><div id="sources"></div>
+</section>
+<section>
+<h2>Upload a document</h2><p class="muted">PDF, TXT or MD up to 5 MB; scanned PDFs are not supported.</p>
+<form id="uploadForm"><label for="file">Choose file</label><input id="file" type="file" required accept=".pdf,.txt,.md">
+<label for="strategy">Chunking strategy</label><select id="strategy"><option value="paragraph">Paragraph-aware grouping</option><option value="fixed">Fixed overlapping word windows</option></select>
+<button type="submit" id="upload">Upload and index</button></form><p id="uploadStatus" role="status"></p>
+</section>
+<section><h2>Manage uploaded documents</h2><button id="refresh" class="secondary">Refresh documents</button><div id="docs"><p>Load the document list to view or manage uploads.</p></div></section>
+</main>
+<script>
+const el=id=>document.getElementById(id);
+const auth=()=>({'Authorization':'Bearer '+el('token').value});
+const errtext=async resp=>{try{const x=await resp.json();return x.detail||resp.statusText}catch{return resp.statusText}};
+async function req(url,options={}){const h={...(options.headers||{}),...auth()};let response=await fetch(url,{...options,headers:h});if(!response.ok)throw new Error(await errtext(response));return response.json()}
+function node(tag, text, cls){let x=document.createElement(tag);if(text!==undefined)x.textContent=text;if(cls)x.className=cls;return x}
+function clear(x){x.replaceChildren()}
+const setBusy=(id,b)=>el(id).disabled=b;
+el('ask').onclick=async()=>{
+ setBusy('ask',true);el('status').textContent='Searching source documents and preparing the answer…';el('status').className='';clear(el('result'));clear(el('sources'));el('resultTitle').hidden=true;
+ try{
+  const result=await req('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:el('question').value,scope:el('scope').value,mode:el('mode').value,rounds:2})});
+  el('resultTitle').hidden=false;el('result').textContent=result.answer;
+  el('status').textContent='Status: '+result.status+' · Search queries: '+result.search_queries.join(' | ');
+  const heading=node('h2','Retrieved evidence ('+result.sources.length+')');el('sources').append(heading);
+  for(const s of result.sources){let d=node('details',undefined,'source');let summary=node('summary','['+s.id+'] '+s.title+' · '+s.source_type);d.append(summary);d.append(node('p',s.text));d.append(node('p','Source ID: '+s.source_id,'muted'));el('sources').append(d)}
+ }catch(e){el('status').textContent=e.message;el('status').className='error'}finally{setBusy('ask',false)}
+};
+el('uploadForm').onsubmit=async ev=>{
+ ev.preventDefault();setBusy('upload',true);el('uploadStatus').textContent='Extracting and indexing…';el('uploadStatus').className='';
+ try{let form=new FormData();form.append('file',el('file').files[0]);form.append('strategy',el('strategy').value);const v=await req('/api/documents',{method:'POST',body:form});el('uploadStatus').textContent='Indexed '+v.chunk_count+' chunks from '+v.filename;await refresh()}
+ catch(e){el('uploadStatus').textContent=e.message;el('uploadStatus').className='error'}finally{setBusy('upload',false)}
+};
+async function refresh(){el('docs').textContent='Loading…';try{const data=await req('/api/documents');clear(el('docs'));if(!data.documents.length){el('docs').append(node('p','No documents uploaded yet.'));return}
+for(const d of data.documents){const x=node('div',undefined,'doc');x.append(node('strong',d.title));x.append(node('p',d.filename+' · '+d.source_type+' · '+d.chunk_count+' chunks · '+d.chunk_strategy,'muted'));
+ const a=node('div',undefined,'actions');const replace=node('button','Replace file','secondary');const remove=node('button','Delete','danger');
+ replace.onclick=async()=>{let inp=document.createElement('input');inp.type='file';inp.accept='.md,.txt,.pdf';inp.onchange=async()=>{if(!inp.files.length)return;const f=new FormData();f.append('file',inp.files[0]);f.append('strategy',d.chunk_strategy);try{await req('/api/documents/'+d.document_id,{method:'PUT',body:f});await refresh()}catch(e){alert(e.message)}};inp.click()};
+ remove.onclick=async()=>{if(!confirm('Delete '+d.title+' and all indexed chunks?'))return;try{await req('/api/documents/'+d.document_id,{method:'DELETE'});await refresh()}catch(e){alert(e.message)}};
+ a.append(replace,remove);x.append(a);el('docs').append(x)}
+ }catch(e){el('docs').textContent=e.message;el('docs').className='error'}}
+el('refresh').onclick=refresh;
+</script>
+</body></html>
