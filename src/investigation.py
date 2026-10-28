@@ -14,6 +14,7 @@ from typing import Callable
 from dotenv import load_dotenv
 
 from src.retrieval import hybrid_search, DENSE_MODEL
+from src.citations import cited_indices, normalize_citations
 
 TOOL = {
     "type": "function",
@@ -230,7 +231,10 @@ def investigate(question: str, qdrant, groq, *, collection: str = "hotpot_eviden
         answer = (final.choices[0].message.content or "").strip()
     else:
         answer = "Insufficient evidence: no indexed source passages were retrieved."
-    used = {int(x) for x in re.findall(r"\[(\d{1,3})\]", answer)}
+    # Canonicalize the provider's Unicode citation typography before validating.
+    # This does NOT verify that a cited passage entails a factual claim.
+    answer = normalize_citations(answer)
+    used = cited_indices(answer)
     valid = {e["id"] for e in evidence.values()}
     invalid = sorted(used - valid)
     grounded = bool(used & valid) and not invalid

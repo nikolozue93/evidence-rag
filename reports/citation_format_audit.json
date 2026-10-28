@@ -1,0 +1,113 @@
+{
+  "answers": {
+    "successful_questions": 40,
+    "errors": 0,
+    "citation_formats": {
+      "unicode_fullwidth": 24,
+      "ascii_square_brackets": 15,
+      "no_obvious_citation": 1
+    },
+    "answers_with_numeric_source_references": 39,
+    "answers_with_valid_numbered_source_references": 39,
+    "numbered_reference_validity_rate": 0.975,
+    "invalid_or_missing_reference_questions": [
+      {
+        "question_id": "5ab3b0bf5542992ade7c6e39",
+        "used_ids": [],
+        "invalid_ids": []
+      }
+    ],
+    "caveat": "Numerical source-reference validity only; does not verify source factual support. The old CSV lacks a numeric-reference-to-source-ID map, so gold-source citation coverage metrics cannot be retrospectively repaired."
+  },
+  "edge_cases": {
+    "cases": [
+      {
+        "case_id": "missing_1",
+        "kind": "unanswerable",
+        "expected_behavior_detected": 1,
+        "numeric_citations_valid": 1,
+        "citation_ids": [
+          1
+        ]
+      },
+      {
+        "case_id": "missing_2",
+        "kind": "unanswerable",
+        "expected_behavior_detected": 1,
+        "numeric_citations_valid": 1,
+        "citation_ids": [
+          1
+        ]
+      },
+      {
+        "case_id": "missing_3",
+        "kind": "unanswerable",
+        "expected_behavior_detected": 1,
+        "numeric_citations_valid": 1,
+        "citation_ids": [
+          1
+        ]
+      },
+      {
+        "case_id": "missing_4",
+        "kind": "unanswerable",
+        "expected_behavior_detected": 1,
+        "numeric_citations_valid": 1,
+        "citation_ids": [
+          1
+        ]
+      },
+      {
+        "case_id": "conflict_1",
+        "kind": "contradictory",
+        "expected_behavior_detected": 1,
+        "numeric_citations_valid": 1,
+        "citation_ids": [
+          1,
+          2
+        ]
+      },
+      {
+        "case_id": "conflict_2",
+        "kind": "contradictory",
+        "expected_behavior_detected": 1,
+        "numeric_citations_valid": 1,
+        "citation_ids": [
+          1,
+          2
+        ]
+      },
+      {
+        "case_id": "conflict_3",
+        "kind": "contradictory",
+        "expected_behavior_detected": 1,
+        "numeric_citations_valid": 1,
+        "citation_ids": [
+          1,
+          2
+        ]
+      },
+      {
+        "case_id": "conflict_4",
+        "kind": "contradictory",
+        "expected_behavior_detected": 1,
+        "numeric_citations_valid": 1,
+        "citation_ids": [
+          1,
+          2
+        ]
+      }
+    ],
+    "by_kind": {
+      "contradictory": {
+        "passed": 4,
+        "total": 4
+      },
+      "unanswerable": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    "caveat": "Synthetic evidence supplied directly; heuristic checks, not end-to-end Qdrant testing or full claim entailment."
+  }
+}

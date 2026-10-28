@@ -18,6 +18,8 @@ import tempfile
 import time
 from pathlib import Path
 
+from src.citations import cited_indices, normalize_citations
+
 FIELDS = [
     "question_id", "mode", "question_type", "question", "gold_answer", "answer",
     "gold_in_answer", "token_f1", "citations_valid", "cited_gold_fraction",
@@ -61,10 +63,10 @@ def score_result(item: dict, result: dict) -> dict:
     gold = set(map(str, item["supporting_source_ids"]))
     source_by_index = {int(s["id"]): str(s["source_id"]) for s in result["sources"]}
     retrieved = set(source_by_index.values())
-    cited_numbers = set(map(int, re.findall(r"\[(\d+)\]", result["answer"])))
+    cited_numbers = cited_indices(result["answer"])
     valid_citations = cited_numbers & set(source_by_index)
     cited_sources = {source_by_index[i] for i in valid_citations}
-    answer = result["answer"]
+    answer = normalize_citations(result["answer"])
     return {
         "question_id": item["question_id"],
         "question_type": item.get("question_type", ""),

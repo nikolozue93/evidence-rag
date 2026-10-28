@@ -16,6 +16,8 @@ import os
 import re
 from pathlib import Path
 
+from src.citations import cited_indices, normalize_citations
+
 # The source texts deliberately contain no real-world claims.
 CASES = [
     {"id": "missing_1", "kind": "unanswerable",
@@ -95,9 +97,10 @@ def main():
         try:
             r = investigate(case["question"], None, groq, search_fn=make_search(case),
                             model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"), search_rounds=args.rounds)
-            citation_count = len(r["citation_ids_used"])
+            # Independently parse the answer in case a provider uses Unicode citations.
+            citation_count = len(cited_indices(r["answer"]))
             row = {"case_id": case["id"], "kind": case["kind"], "question": case["question"],
-                   "answer": r["answer"],
+                   "answer": normalize_citations(r["answer"]),
                    "expected_behavior_detected": int(classify(case["kind"], r["answer"], citation_count)),
                    "citations_valid": int(not r["invalid_citation_ids"] and citation_count > 0),
                    "citations_used": citation_count, "error": ""}
