@@ -1,7 +1,17 @@
 .env
-.venv/
-__pycache__/
-*.pyc
+.env.*
+!.env.example
 
-data/processed/
-*.sqlite
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+.idea/
+.vscode/
+*.log
+
+data/processed/*
+!data/processed/hotpot_eval.jsonl
+!data/processed/hotpot_records.manifest.json
