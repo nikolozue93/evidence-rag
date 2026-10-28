@@ -1,0 +1,29 @@
+case_id,kind,question,answer,expected_behavior_detected,citations_valid,citations_used,error
+missing_1,unanswerable,Who signed off the Orion Ridge migration on 17 March?,"The available evidence only notes that the Orion Ridge migration was scheduled for 17 March, but it does not record who signed off on the migration【1】.  
+
+**Conclusion:** Insufficient evidence – the identity of the person who signed off the Orion Ridge migration on 17 March is not provided in the retrieved documents.",1,0,0,
+missing_2,unanswerable,What was the exact financial loss from the Sapphire Queue outage?,"The available evidence does not provide any monetary figure for the Sapphire Queue outage. The incident note states that the outage “had a processing delay” and “reports no financial loss estimate or monetary figures”【1】.  
+
+**Conclusion:** Insufficient evidence – the exact financial loss from the Sapphire Queue outage is not documented in the retrieved sources.",1,0,0,
+missing_3,unanswerable,Which engineer fixed the Amber Relay incident?,Insufficient evidence – the retrieved documents do not identify the engineer who fixed the Amber Relay incident. The available change‑log entry notes that “Amber Relay was restored at 15:20 after a configuration rollback” but states that “the author and responder are not identified”【1】. No other source provides a name.,1,0,0,
+missing_4,unanswerable,What was the exact root cause of the Delta Crate timeout?,"The available evidence states that “Delta Crate requests timed out. The team is still investigating the cause. The root cause is unknown.” [1]  
+
+Thus, there is insufficient evidence to determine the exact root cause of the Delta Crate timeout.",1,1,1,
+conflict_1,contradictory,Which vendor processed the fictional Indigo Harbor settlement on 4 April?,"The available indexed documents disagree about which vendor processed the fictional Indigo Harbor settlement on 4 April.  
+
+- Document [1] states that the settlement was processed by **Horizon Systems**.  
+- Document [2] states that the settlement was processed by **Meridian Analytics** and does not mention Horizon Systems.  
+
+**Conflicting evidence** exists, and the sources do not agree on a single vendor.",1,1,2,
+conflict_2,contradictory,How many nodes failed during the fictional Cedar Beacon incident?,"The retrieved sources do not agree on how many nodes failed during the Cedar Beacon incident. One document states that **exactly 3 nodes failed**【1】, while another document reports that **exactly 7 nodes failed**【2】.  
+
+**Conclusion:** Conflicting evidence; the exact number of failed nodes cannot be determined from the available sources.",0,0,0,
+conflict_3,contradictory,On what date did the fictional Cobalt Finch service launch?,"The retrieved documents give two different launch dates for the fictional Cobalt Finch service:
+
+- One source states that Cobalt Finch launched on **12 June 2024**【1】.  
+- Another source claims that Cobalt Finch launched on **18 June 2024**【2】.
+
+**Conclusion:** The evidence is contradictory; the exact launch date cannot be determined from the available sources.",0,0,0,
+conflict_4,contradictory,What caused the fictional Violet Gate outage?,"The available evidence does not agree on a single cause for the fictional Violet Gate outage. One source states that the outage was caused by a malformed cache configuration [1], while another source attributes it to a failed database migration and explicitly rejects the cache‑configuration explanation [2].  
+
+**Conclusion:** Conflicting evidence exists regarding the cause of the Violet Gate outage.",1,1,2,
