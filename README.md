@@ -179,6 +179,7 @@ Known limitations:
 - Exact-text deduplication does not detect paraphrased duplicates.
 - Updating a document involves multiple Qdrant operations; it is not a cross-collection transaction, and concurrent updates to one document are not guaranteed safe.
 - Hybrid retrieval improves evidence coverage in the tested sample, but it still missed at least one supporting source for 16 of 40 questions at K=8.
+- When searching both collections, results are combined using round-robin mixing rather than a globally calibrated relevance ranking. Consequently, unrelated passages may appear among the retrieved candidates, even when the final answer cites only relevant evidence.
 
 ## Data and development disclosure
 
