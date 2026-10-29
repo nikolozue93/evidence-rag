@@ -1,0 +1,18 @@
+CUSTOMER IMPACT NOTES - INC-0312
+Record type: Support and operations observations
+Date: March 12, 2026
+Classification: FICTIONAL DEMONSTRATION DATA
+
+Ticket SUP-1841 - 09:29
+Customer reported that card checkout returned a temporary payment error after waiting several seconds. A retry succeeded later in the morning. Affected workflow: new purchases through checkout-api.
+
+Ticket SUP-1846 - 09:47
+Several customers reported that scheduled subscription renewals remained in a pending state. Support escalated the reports to the billing team. Affected workflow: renewals-worker.
+
+Operations note - 10:25
+New checkout complaints slowed after the gateway rollback. The billing queue continued processing pending renewal attempts. This note is an observation, not proof of the underlying cause.
+
+Support summary - 11:05
+Customer-facing impact was reported for both checkout and recurring subscription renewals. No confirmed permanent loss of payment records was reported in these notes. The exact number of lost transactions and monetary loss were NOT established.
+
+Reference: INC-0312 (incident report) and CHG-0312 (production change log).
