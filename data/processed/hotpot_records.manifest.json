@@ -1,0 +1,9 @@
+{
+  "unique_passage_records": 50527,
+  "train_examples_processed": 5490,
+  "validation_questions_saved": 60,
+  "records_path": "data/processed/hotpot_records.jsonl",
+  "evaluation_path": "data/processed/hotpot_eval.jsonl",
+  "deduplication": "SHA256(normalized, casefolded passage text)",
+  "minimum_passage_chars": 80
+}
